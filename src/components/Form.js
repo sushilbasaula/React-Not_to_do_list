@@ -3,7 +3,6 @@ import { randomStr } from "../utilis";
 
 export const Form = ({ addTask }) => {
   const [form, setForm] = useState({ type: "entry" });
-  // console.log(form);
 
   const handleOnChange = (e) => {
     const { value, name } = e.target;
@@ -12,13 +11,12 @@ export const Form = ({ addTask }) => {
       ...form,
       [name]: value,
     });
-    // console.log(form);
   };
 
   const handleOnSubmit = (e) => {
     e.preventDefault();
     const _id = randomStr();
-    console.log(_id);
+
     addTask({ ...form, _id });
   };
   return (
