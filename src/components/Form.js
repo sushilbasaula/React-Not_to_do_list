@@ -13,6 +13,7 @@ export const Form = ({ addTask }) => {
     });
   };
 
+  console.log(form);
   const handleOnSubmit = (e) => {
     e.preventDefault();
     const _id = randomStr();

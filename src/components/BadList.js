@@ -15,7 +15,7 @@ export const BadList = ({
         <tbody id="bad-task">
           {badList.map((item, i) => {
             return (
-              <tr>
+              <tr key={item._id}>
                 <td>
                   <td>
                     <input

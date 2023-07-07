@@ -16,11 +16,10 @@ function App() {
     if (hrPerWeek < totalHrs + +data.hr) {
       return alert("Boss, you don't have enough time, sorry la");
     }
-    // console.log(data);
+
     setTaskList([...taskList, data]);
   };
   const switchTask = (_id, type) => {
-    console.log(_id);
     const temArg = taskList.map((item, index) => {
       if (item._id === _id) {
         item.type = type;
@@ -28,18 +27,16 @@ function App() {
       return item;
     });
     setTaskList(temArg);
-    // console.log(taskList);
   };
   const handleOnSelect = (e) => {
     const { value, checked } = e.target;
-    // console.log(value, checked);
+
     checked
       ? setItmToDelete([...itmToDelete, value])
       : // const filteredArg = itmToDelete.filter((item) => item !== value);
         setItmToDelete(itmToDelete.filter((item) => item !== value));
   };
   const handleOnDelete = () => {
-    console.log("Deleting");
     // const filteredArg = taskList.filter((item) =>
     //   itmToDelete.includes(item._id)
     // );
@@ -50,8 +47,6 @@ function App() {
 
     setItmToDelete([]);
   };
-  console.log(itmToDelete);
-  // console.log(taskList);
 
   return (
     <div className="wrapper">
