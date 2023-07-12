@@ -3,30 +3,46 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Title } from "./components/Title";
 import { Form } from "./components/Form";
 import { ListArea } from "./components/ListArea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchAllTask, postTask, updateTask } from "./helpers/axiosHelpers";
+import { get } from "mongoose";
 
 const hrPerWeek = 7 * 24;
 
 function App() {
   const [taskList, setTaskList] = useState([]);
   const [itmToDelete, setItmToDelete] = useState([]);
+  const [response, setResponse] = useState({});
+
   const totalHrs = taskList.reduce((subTtl, item) => subTtl + +item.hr, 0);
   // const handleOnSubmit = (e) => {};
-  const addTask = (data) => {
+  useEffect(() => {
+    getTasks();
+  }, []);
+  // call axios to fetch all data
+  const getTasks = async () => {
+    const { status, tasks } = await fetchAllTask();
+    status === "success" && setTaskList(tasks);
+  };
+
+  const addTask = async (data) => {
     if (hrPerWeek < totalHrs + +data.hr) {
       return alert("Boss, you don't have enough time, sorry la");
     }
 
-    setTaskList([...taskList, data]);
+    // send data to the api
+    const result = await postTask(data);
+    console.log(result);
+
+    result?.status === "success" && getTasks();
+    setResponse(result);
   };
-  const switchTask = (_id, type) => {
-    const temArg = taskList.map((item, index) => {
-      if (item._id === _id) {
-        item.type = type;
-      }
-      return item;
-    });
-    setTaskList(temArg);
+  const switchTask = async (_id, type) => {
+    const result = await updateTask({ _id, type });
+
+    setResponse(result);
+
+    result?.status === "success" && getTasks();
   };
   const handleOnSelect = (e) => {
     const { value, checked } = e.target;
@@ -52,7 +68,17 @@ function App() {
     <div className="wrapper">
       <div className="container">
         <Title />
-
+        {response.message && (
+          <div
+            className={
+              response.status === "success"
+                ? "alert alert-success"
+                : "alert alert-danger"
+            }
+          >
+            {response.message}
+          </div>
+        )}
         <Form addTask={addTask} />
 
         <ListArea
