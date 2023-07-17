@@ -38,3 +38,14 @@ export const updateTask = async (dataObj) => {
     };
   }
 };
+export const deleteTasks = async (idArg) => {
+  try {
+    const { data } = await axios.delete(taskEp, { data: idArg });
+    return data;
+  } catch (error) {
+    return {
+      status: "error",
+      message: error.message,
+    };
+  }
+};

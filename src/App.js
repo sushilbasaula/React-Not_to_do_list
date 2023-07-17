@@ -4,7 +4,12 @@ import { Title } from "./components/Title";
 import { Form } from "./components/Form";
 import { ListArea } from "./components/ListArea";
 import { useEffect, useState } from "react";
-import { fetchAllTask, postTask, updateTask } from "./helpers/axiosHelpers";
+import {
+  deleteTasks,
+  fetchAllTask,
+  postTask,
+  updateTask,
+} from "./helpers/axiosHelpers";
 import { get } from "mongoose";
 
 const hrPerWeek = 7 * 24;
@@ -13,7 +18,7 @@ function App() {
   const [taskList, setTaskList] = useState([]);
   const [itmToDelete, setItmToDelete] = useState([]);
   const [response, setResponse] = useState({});
-
+  const [isAllSelected, setIsAllSelcted] = useState(false);
   const totalHrs = taskList.reduce((subTtl, item) => subTtl + +item.hr, 0);
   // const handleOnSubmit = (e) => {};
   useEffect(() => {
@@ -47,23 +52,37 @@ function App() {
   const handleOnSelect = (e) => {
     const { value, checked } = e.target;
 
-    checked
-      ? setItmToDelete([...itmToDelete, value])
-      : // const filteredArg = itmToDelete.filter((item) => item !== value);
-        setItmToDelete(itmToDelete.filter((item) => item !== value));
+    if (checked) {
+      setItmToDelete([...itmToDelete, value]);
+      setIsAllSelcted(taskList.length === itmToDelete.length + 1);
+    } else {
+      setItmToDelete(itmToDelete.filter((item) => item !== value));
+      setIsAllSelcted(false);
+    }
   };
-  const handleOnDelete = () => {
-    // const filteredArg = taskList.filter((item) =>
-    //   itmToDelete.includes(item._id)
-    // );
+  const handleOnDelete = async () => {
     if (!window.confirm("Are You Sure you want to delete")) {
       return;
     }
-    setTaskList(taskList.filter((item) => !itmToDelete.includes(item._id)));
-
+    // setTaskList(taskList.filter((item) => !itmToDelete.includes(item._id)));
+    const result = await deleteTasks(itmToDelete);
+    console.log(result);
+    setResponse(result);
     setItmToDelete([]);
+    result.status === "success" && getTasks();
   };
+  const handleOnAllClick = (e) => {
+    const { checked } = e.target;
+    console.log(checked);
 
+    if (checked) {
+      setItmToDelete(taskList.map(({ _id }) => _id));
+      setIsAllSelcted(true);
+    } else {
+      setItmToDelete([]);
+      setIsAllSelcted(false);
+    }
+  };
   return (
     <div className="wrapper">
       <div className="container">
@@ -88,6 +107,17 @@ function App() {
           itmToDelete={itmToDelete}
         />
 
+        {taskList.length ? (
+          <div className="fw-bolder py-4">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              onChange={handleOnAllClick}
+              checked={isAllSelected}
+            />
+            <label htmlFor="">Select all the tasks</label>
+          </div>
+        ) : null}
         <div className="row fw-bold">
           <div className="col">
             The total hours allocated = <span id="totalHrs">{totalHrs}</span>{" "}
